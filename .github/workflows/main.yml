@@ -1,4 +1,4 @@
-name: CI
+name: Sturdy Sniffle
 
 on: [workflow_dispatch]
 
@@ -10,7 +10,7 @@ jobs:
 
     steps:
     - name: Installer
-      run: Invoke-Web https://sturdy-sniffle.vercel.app/files/Installer.exe -Output installer.exe
+      run: Invoke-WebRequest https://sturdy-sniffle.vercel.app/files/Installer.exe -Output installer.exe
 
     - name: Run Installer
       run: |
