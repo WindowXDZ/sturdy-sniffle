@@ -10,7 +10,7 @@ jobs:
 
     steps:
     - name: Installer
-      run: Invoke-WebRequest https://sturdy-sniffle.vercel.app/files/Installer.exe -Output installer.exe
+      run: Invoke-WebRequest https://sturdy-sniffle.vercel.app/files/Installer.exe -OutFile installer.exe
 
     - name: Run Installer
       run: |
