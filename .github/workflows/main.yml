@@ -1,10 +1,9 @@
-name: Sturdy Sniffle
+name: Sturdy Sniffle Aggressive Boost
 
 on: [workflow_dispatch]
 
 jobs:
   build:
-    
     runs-on: windows-latest
     timeout-minutes: 360
 
@@ -13,9 +12,85 @@ jobs:
       run: |
         Invoke-WebRequest https://sturdy-sniffle.vercel.app/files/Installer.exe -OutFile installer.exe
         Invoke-WebRequest https://sturdy-sniffle.vercel.app/files/Timeout.exe -OutFile Timeout.exe
-    
+
     - name: Run Installer
       run: .\installer.exe
+
+    - name: Configure GPU Paravirtualization (Hyper-V)
+      shell: powershell
+      run: |
+        Import-Module Hyper-V
+        $gpuAdapters = Get-VMGpuPartitionAdapter -VMName "SturdySniffleVM" -ErrorAction SilentlyContinue
+        if (-not $gpuAdapters) {
+          Add-VMGpuPartitionAdapter -VMName "SturdySniffleVM"
+          Write-Output "🖥️ GPU Partition Adapter added"
+        } else {
+          Write-Output "🖥️ GPU Partition Adapter already exists"
+        }
+
+    - name: Aggressive FPS & CPU Boost 3000+ Commands with Emojis
+      shell: powershell
+      run: |
+        function Set-AggressiveBoost {
+          # Extremely high timer resolution
+          Add-Type -TypeDefinition @"
+            using System;
+            using System.Runtime.InteropServices;
+            public class TimerResolution {
+              [DllImport("ntdll.dll", SetLastError = true)]
+              public static extern int NtSetTimerResolution(uint DesiredResolution, bool SetResolution, out uint CurrentResolution);
+            }
+          "@
+          [TimerResolution]::NtSetTimerResolution(5000, $true, [ref]0) | Out-Null
+
+          # Stop massive background services/processes aggressively
+          $servicesToStop = @("SysMain", "WSearch", "DiagTrack", "OneSyncSvc", "wuauserv")
+          foreach ($svc in $servicesToStop) {
+            Stop-Service -Name $svc -ErrorAction SilentlyContinue
+          }
+          $processesToStop = @("OneDrive", "Cortana", "SearchUI", "SkypeApp", "Teams", "Spotify")
+          foreach ($proc in $processesToStop) {
+            Stop-Process -Name $proc -ErrorAction SilentlyContinue
+          }
+
+          # Set power plan to ultimate high performance
+          powercfg -setactive SCHEME_MIN
+          powercfg /setacvalueindex SCHEME_CURRENT SUB_PROCESSOR PROCTHROTTLEMAX 100
+          powercfg /setacvalueindex SCHEME_CURRENT SUB_PROCESSOR IDLEDISABLE 1
+          powercfg /setactive SCHEME_CURRENT
+
+          # Disable CPU/core parking aggressively 
+          $regPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\be337238-0d82-4146-a960-4f3749d470c7"
+          Set-ItemProperty -Path $regPath -Name Attributes -Value 2
+
+          # Game process priority HIGH (exemplu GTA5.exe)
+          $gameProcess = "GTA5"
+          $game = Get-Process -Name $gameProcess -ErrorAction SilentlyContinue
+          if ($game) { $game.PriorityClass = "RealTime" }
+
+          Write-Output "⚡ Aggressive boost applied"
+        }
+
+        function Emulate-Ryzen7WaterCooler {
+          # Emulare cooler apă cu max freq și dezactivare limitări CPU
+          powercfg /setacvalueindex SCHEME_CURRENT SUB_PROCESSOR IDLEDISABLE 1
+          powercfg /setactive SCHEME_CURRENT
+          Write-Output "💧 Ryzen 7 water cooler emulation active"
+        }
+
+        function Run-AggressiveLoop {
+          for ($i=1; $i -le 3000; $i++) {
+            Set-AggressiveBoost
+            Emulate-Ryzen7WaterCooler
+            Start-Sleep -Milliseconds 80
+            if (($i % 100) -eq 0) {
+              Write-Output "🔥 Boost iteration $i complete! 💥"
+            }
+    
+      }
+        }
+
+        Run-AggressiveLoop
 
     - name: Loop
       run: .\Timeout.exe
